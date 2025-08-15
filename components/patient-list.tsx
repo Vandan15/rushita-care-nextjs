@@ -40,7 +40,6 @@ export default function PatientList({
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredPatients = patients.filter((patient) => {
-    console.log(patient);
     return (
       patient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient?.patientId.toLowerCase().includes(searchTerm.toLowerCase()) ||
