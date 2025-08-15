@@ -99,7 +99,7 @@ export default function AddPatientDialog({ open, onOpenChange }: AddPatientDialo
                 className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 bg-blue-500 hover:bg-blue-600"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <Upload className="h-4 w-4" />
+                <Upload className="h-4 w-4 text-white" />
               </Button>
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
