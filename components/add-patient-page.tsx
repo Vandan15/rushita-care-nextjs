@@ -275,7 +275,7 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
                   className="absolute -bottom-2 -right-2 h-7 w-7 sm:h-8 sm:w-8 rounded-full p-0 bg-blue-500 hover:bg-blue-600"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Upload className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </Button>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />

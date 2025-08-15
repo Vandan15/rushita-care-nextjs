@@ -16,6 +16,8 @@ import {
   Plus,
   Edit,
   ChevronRight,
+  ChartArea,
+  ChartBar,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNowStrict } from "date-fns";
@@ -98,6 +100,7 @@ export default function PatientList({
             onClick={onViewAnalytics}
             className="hidden sm:flex w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
           >
+            <ChartBar className="h-4 w-4" />
             View Analytics
           </Button>
           <Button
@@ -127,7 +130,7 @@ export default function PatientList({
             {!searchTerm && (
               <Button
                 onClick={onAddPatient}
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
               >
                 <Plus className="h-4 w-4" />
                 Add Your First Patient
