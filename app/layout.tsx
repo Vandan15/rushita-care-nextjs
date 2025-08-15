@@ -24,6 +24,14 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
   themeColor: "#0ea5e9",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  openGraph:{
+    images:[{
+      url:"/og-image.png",
+      width:1200,
+      height:630,
+      alt:"RushitaCare"
+    }]
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
