@@ -26,6 +26,7 @@ interface PatientListProps {
   onEdit: (patient: Patient) => void;
   onViewDetails: (patient: Patient) => void;
   onAddPatient: () => void;
+  onViewAnalytics: () => void;
 }
 
 export default function PatientList({
@@ -34,11 +35,12 @@ export default function PatientList({
   onEdit,
   onViewDetails,
   onAddPatient,
+  onViewAnalytics
 }: PatientListProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredPatients = patients.filter((patient) => {
-    console.log(patient)
+    console.log(patient);
     return (
       patient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient?.patientId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,13 +94,21 @@ export default function PatientList({
             className="pl-9 sm:pl-10 h-10 sm:h-12 border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm sm:text-base"
           />
         </div>
-        <Button
-          onClick={onAddPatient}
-          className="hidden sm:flex w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Patient
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={onViewAnalytics}
+            className="hidden sm:flex w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+          >
+            View Analytics
+          </Button>
+          <Button
+            onClick={onAddPatient}
+            className="hidden sm:flex w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+          >
+            <Plus className="h-4 w-4" />
+            Add Patient
+          </Button>
+        </div>
       </div>
 
       {filteredPatients.length === 0 ? (
@@ -120,7 +130,7 @@ export default function PatientList({
                 onClick={onAddPatient}
                 className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Add Your First Patient
               </Button>
             )}

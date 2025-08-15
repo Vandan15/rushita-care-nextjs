@@ -150,7 +150,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
         </div> */}
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={() => onEdit(patient)} className="bg-white border-slate-200">
-            <Edit className="h-4 w-4 mr-2" />
+            <Edit className="h-4 w-4" />
             <span>Edit</span>
           </Button>
           <Button
@@ -159,7 +159,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
             onClick={handleDelete}
             className="bg-white border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash2 className="h-4 w-4" />
             <span>Delete</span>
           </Button>
         </div>
@@ -264,7 +264,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
                   disabled={modifyingRecord !== null || todayAttendance.status === "present"}
                   className="flex-1 bg-green-500 hover:bg-green-600 text-white disabled:opacity-50 text-sm"
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <CheckCircle className="h-4 w-4" />
                   {modifyingRecord === "present" ? "Updating..." : "Mark Present"}
                 </Button>
                 <Button
@@ -273,7 +273,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
                   variant="outline"
                   className="flex-1 border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 text-sm bg-white"
                 >
-                  <XCircle className="h-4 w-4 mr-2" />
+                  <XCircle className="h-4 w-4" />
                   {modifyingRecord === "absent" ? "Updating..." : "Mark Absent"}
                 </Button>
               </div>
@@ -285,7 +285,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
                 disabled={markingAttendance !== null}
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
               >
-                <CheckCircle className="h-4 w-4 mr-2" />
+                <CheckCircle className="h-4 w-4" />
                 {markingAttendance === "present" ? "Marking..." : "Mark Present"}
               </Button>
               <Button
@@ -294,7 +294,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
                 variant="outline"
                 className="flex-1 border-red-200 text-red-600 hover:bg-red-50 text-sm bg-white"
               >
-                <XCircle className="h-4 w-4 mr-2" />
+                <XCircle className="h-4 w-4" />
                 {markingAttendance === "absent" ? "Marking..." : "Mark Absent"}
               </Button>
             </div>

@@ -156,7 +156,7 @@ export default function PatientDetailsDialog({ patient, open, onOpenChange }: Pa
                       disabled={markingAttendance !== null}
                       className="flex-1 bg-green-500 hover:bg-green-600 text-white"
                     >
-                      <CheckCircle className="h-4 w-4 mr-2" />
+                      <CheckCircle className="h-4 w-4" />
                       {markingAttendance === "present" ? "Marking..." : "Mark Present"}
                     </Button>
                     <Button
@@ -165,7 +165,7 @@ export default function PatientDetailsDialog({ patient, open, onOpenChange }: Pa
                       variant="outline"
                       className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
                     >
-                      <XCircle className="h-4 w-4 mr-2" />
+                      <XCircle className="h-4 w-4" />
                       {markingAttendance === "absent" ? "Marking..." : "Mark Absent"}
                     </Button>
                   </div>

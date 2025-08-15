@@ -226,7 +226,7 @@ export default function ProfilePage({ user }: ProfilePageProps) {
                 disabled={loading}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
               >
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4" />
                 {loading ? "Updating..." : "Update Profile"}
               </Button>
             </div>
@@ -252,7 +252,7 @@ export default function ProfilePage({ user }: ProfilePageProps) {
                 onClick={handleLogout}
                 className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 bg-white"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4" />
                 Sign Out
               </Button>
             </div>

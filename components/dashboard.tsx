@@ -39,6 +39,10 @@ export default function Dashboard({ user }: DashboardProps) {
     setCurrentPage("patient-details")
   }
 
+  const handleViewAnalytics = () => {
+    setCurrentPage("analytics")
+  }
+
   const handleEditPatient = (patient: Patient) => {
     setSelectedPatient(patient)
     setCurrentPage("edit-patient")
@@ -63,6 +67,7 @@ export default function Dashboard({ user }: DashboardProps) {
             onEdit={handleEditPatient}
             onViewDetails={handleViewPatientDetails}
             onAddPatient={handleAddPatient}
+            onViewAnalytics={handleViewAnalytics}
           />
         )
       case "analytics":

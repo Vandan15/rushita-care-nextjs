@@ -397,7 +397,7 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">
@@ -406,7 +406,7 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
                   </div>
                 ) : (
                   <>
-                    {isEditing ? <Save className="h-4 w-4 mr-2" /> : <UserPlus className="h-4 w-4 mr-2" />}
+                    {isEditing ? <Save className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
                     {isEditing ? "Update Patient" : "Add Patient"}
                   </>
                 )}
