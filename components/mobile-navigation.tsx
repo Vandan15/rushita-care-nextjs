@@ -31,7 +31,7 @@ export default function MobileNavigation({ currentPage, onPageChange, onAddPatie
               size="sm"
               onClick={() => onPageChange(item.id)}
               className={`flex flex-col items-center space-y-1 h-auto py-2 px-3 min-w-0 flex-1 ${
-                isActive ? "text-blue-600 bg-blue-50" : "text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                isActive ? "text-blue-600 bg-blue-50 hover:text-blue-600 hover:bg-blue-50" : "text-slate-600 hover:text-blue-600 hover:bg-blue-50 focus:text-blue-600 focus:bg-blue-50"
               }`}
             >
               <Icon className="h-5 w-5" />
