@@ -39,6 +39,10 @@ export default function Dashboard({ user }: DashboardProps) {
     setCurrentPage("patient-details")
   }
 
+  const handleViewAnalytics = () => {
+    setCurrentPage("analytics")
+  }
+
   const handleEditPatient = (patient: Patient) => {
     setSelectedPatient(patient)
     setCurrentPage("edit-patient")
@@ -63,12 +67,13 @@ export default function Dashboard({ user }: DashboardProps) {
             onEdit={handleEditPatient}
             onViewDetails={handleViewPatientDetails}
             onAddPatient={handleAddPatient}
+            onViewAnalytics={handleViewAnalytics}
           />
         )
       case "analytics":
-        return <AttendanceAnalytics patients={patients} />
+        return <AttendanceAnalytics patients={patients} onBack={handleBackToPatients} />
       case "profile":
-        return <ProfilePage user={user} />
+        return <ProfilePage user={user}  onBack={handleBackToPatients}/>
       case "patient-details":
         return selectedPatient ? (
           <PatientDetailsPage patient={selectedPatient} onBack={handleBackToPatients} onEdit={handleEditPatient} />

@@ -9,11 +9,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import DatePicker from "react-datepicker";
-import { BarChart3, TrendingUp, Users, Filter, RotateCcw } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Filter, RotateCcw, ArrowLeft } from "lucide-react";
 import { format, startOfDay, endOfDay } from "date-fns";
 
 interface AttendanceAnalyticsProps {
   patients: Patient[];
+  onBack: () => void;
 }
 
 interface PatientAnalytics {
@@ -27,6 +28,7 @@ interface PatientAnalytics {
 
 export default function AttendanceAnalytics({
   patients,
+  onBack,
 }: AttendanceAnalyticsProps) {
   const [analytics, setAnalytics] = useState<PatientAnalytics[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,12 +117,21 @@ export default function AttendanceAnalytics({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Attendance Analytics</h1>
           <p className="text-sm sm:text-base text-gray-600">Track and analyze patient attendance patterns</p>
-        </div>
-      </div> */}
+        </div> */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onBack}
+          className="hidden sm:flex items-center space-x-2 bg-white border-slate-200"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Patients</span>
+        </Button>
+      </div> 
 
       {/* Date Range Filter */}
       <Card className="bg-white border-slate-200 shadow-lg">
