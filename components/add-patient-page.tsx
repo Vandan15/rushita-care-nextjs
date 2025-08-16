@@ -52,6 +52,7 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
     contact: "",
     address: "",
     profileImage: "",
+    notes: "",
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -67,6 +68,7 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
         contact: patient.contact,
         address: patient.address,
         profileImage: patient.profileImage || "",
+        notes: patient.notes || "",
       })
     }
   }, [patient])
@@ -173,7 +175,7 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
       } else {
         await addPatient(formData)
         setMessage("Patient added successfully!")
-        setFormData({ name: "", contact: "", address: "", profileImage: "" })
+        setFormData({ name: "", contact: "", address: "", profileImage: "", notes: "" })
       }
 
       setTimeout(() => {
@@ -366,8 +368,22 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
                 onChange={(e) => handleChange("address", e.target.value)}
                 placeholder="Enter patient's complete address"
                 rows={3}
-                className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm"
+                className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm resize-none"
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address" className="text-slate-700 font-medium">
+                Notes
+              </Label>
+              <Textarea
+                id="notes"
+                value={formData?.notes}
+                onChange={(e) => handleChange("notes", e.target.value)}
+                placeholder="Additional notes"
+                rows={3}
+                className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm resize-none"
               />
             </div>
 
