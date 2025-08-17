@@ -27,6 +27,7 @@ import {
   NotebookIcon,
   NotepadTextDashedIcon,
   PencilIcon,
+  Copy,
 } from "lucide-react"
 import { format, isToday, parseISO, startOfDay, endOfDay } from "date-fns"
 
@@ -45,6 +46,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null)
   const [modifyingRecord, setModifyingRecord] = useState<string | null>(null)
+  const [copiedPatientId, setCopiedPatientId] = useState(false)
 
   useEffect(() => {
     loadAttendanceHistory()
@@ -130,6 +132,12 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
     }
   }
 
+  const handleCopyPatientId = () => {
+    navigator.clipboard.writeText(patient.patientId)
+    setCopiedPatientId(true)
+    setTimeout(() => setCopiedPatientId(false), 2000)
+  }
+
   const presentCount = filteredRecords.filter((r) => r.status === "present").length
   const absentCount = filteredRecords.filter((r) => r.status === "absent").length
   const totalSessions = filteredRecords.length
@@ -189,7 +197,13 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
 
             <div className="flex-1 text-center sm:text-left">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">{patient.name}</h2>
-              <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-4">Patient ID: {patient.patientId}</Badge>
+              <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-4 cursor-pointer" onClick={handleCopyPatientId}>Patient ID: {patient.patientId}
+                
+                {copiedPatientId ? (
+                  <CheckCircle className="h-4 w-4 ml-1 text-green-500" />
+                ):<Copy className="h-4 w-4 ml-1" />}
+                
+              </Badge>
             </div>
           </div>
 

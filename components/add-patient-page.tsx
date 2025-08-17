@@ -180,7 +180,8 @@ export default function AddPatientPage({ patient, onBack }: AddPatientPageProps)
 
       setTimeout(() => {
         onBack()
-      }, 1500)
+      }, 500)
+
     } catch (error) {
       console.error("Error saving patient:", error)
       setMessage("Failed to save patient. Please try again.")
