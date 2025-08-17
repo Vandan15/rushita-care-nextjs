@@ -50,12 +50,19 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
     try {
       await updateUserProfile({
         displayName: formData.displayName,
-        photoURL: formData.photoURL,
+        photoFile: selectedFile || undefined,
+        photoURL: selectedFile ? undefined : formData.photoURL,
       });
       setMessage("Profile updated successfully!");
+      
+      // Clear the file input after successful upload
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
-      setMessage("Failed to update profile. Please try again.");
+      setMessage(error instanceof Error ? error.message : "Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -65,15 +72,18 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setFormData((prev) => ({ ...prev, photoURL: result }));
-      };
-      reader.readAsDataURL(file);
+      setSelectedFile(file);
+      // Create a preview URL for the image
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewUrl(previewUrl);
+      // Set a preview in the form data (this won't be used for upload, just for display)
+      setFormData(prev => ({ ...prev, photoURL: previewUrl }));
     }
   };
 
@@ -108,8 +118,9 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
             <div className="relative">
               <Avatar className="h-20 w-20 sm:h-24 sm:w-24 ring-4 ring-blue-100">
                 <AvatarImage
-                  src={formData.photoURL || "/placeholder.svg"}
+                  src={previewUrl || formData.photoURL || "/placeholder.svg"}
                   alt="Profile"
+                  className="object-cover"
                 />
                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xl sm:text-2xl font-bold">
                   {(formData.displayName || formData.email)
@@ -199,7 +210,7 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-slate-700 font-medium">
                   Phone Number
@@ -236,9 +247,9 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="bio" className="text-slate-700 font-medium">
                 Professional Bio
               </Label>
@@ -250,7 +261,7 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
                 rows={4}
                 className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm"
               />
-            </div>
+            </div> */}
 
             {message && (
               <div
@@ -268,7 +279,7 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
               <Button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
               >
                 <Save className="h-4 w-4" />
                 {loading ? "Updating..." : "Update Profile"}

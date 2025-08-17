@@ -24,6 +24,10 @@ import {
   Edit,
   RotateCcw,
   Trash2,
+  NotebookIcon,
+  NotepadTextDashedIcon,
+  PencilIcon,
+  Copy,
 } from "lucide-react"
 import { format, isToday, parseISO, startOfDay, endOfDay } from "date-fns"
 
@@ -42,6 +46,7 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null)
   const [modifyingRecord, setModifyingRecord] = useState<string | null>(null)
+  const [copiedPatientId, setCopiedPatientId] = useState(false)
 
   useEffect(() => {
     loadAttendanceHistory()
@@ -127,6 +132,12 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
     }
   }
 
+  const handleCopyPatientId = () => {
+    navigator.clipboard.writeText(patient.patientId)
+    setCopiedPatientId(true)
+    setTimeout(() => setCopiedPatientId(false), 2000)
+  }
+
   const presentCount = filteredRecords.filter((r) => r.status === "present").length
   const absentCount = filteredRecords.filter((r) => r.status === "absent").length
   const totalSessions = filteredRecords.length
@@ -172,10 +183,10 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
             <div className="relative">
               <Avatar className="h-20 w-20 sm:h-24 sm:w-24 ring-4 ring-blue-100">
-                <AvatarImage src={patient.profileImage || "/placeholder.svg"} alt={patient.name} />
+                <AvatarImage src={patient.profileImage || "/placeholder.svg"} alt={patient?.name} />
                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xl sm:text-2xl font-bold">
-                  {patient.name
-                    .split(" ")
+                  {patient?.name
+                    ?.split(" ")
                     .map((n) => n[0])
                     .join("")
                     .toUpperCase()}
@@ -186,7 +197,13 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
 
             <div className="flex-1 text-center sm:text-left">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">{patient.name}</h2>
-              <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-4">Patient ID: {patient.patientId}</Badge>
+              <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-4 cursor-pointer" onClick={handleCopyPatientId}>Patient ID: {patient.patientId}
+                
+                {copiedPatientId ? (
+                  <CheckCircle className="h-4 w-4 ml-1 text-green-500" />
+                ):<Copy className="h-4 w-4 ml-1" />}
+                
+              </Badge>
             </div>
           </div>
 
@@ -226,6 +243,17 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
                 <div className="text-slate-800 font-semibold leading-snug text-sm">{patient.address}</div>
               </div>
             </div>
+
+            {/* Notes */}
+           {patient?.notes && <div className="flex items-start p-4 bg-yellow-50 rounded-xl border border-purple-100 md:col-span-1">
+              <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                <PencilIcon className="h-5 w-5 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-medium text-yellow-700 mb-0.5">Notes</div>
+                <div className="text-slate-800 font-semibold leading-snug text-sm">{patient?.notes}</div>
+              </div>
+            </div>}
           </div>
         </CardContent>
       </Card>
