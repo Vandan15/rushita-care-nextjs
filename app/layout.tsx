@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#0ea5e9" />
         <meta name="msapplication-TileColor" content="#0ea5e9" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
       </head>
       <body className={`${poppins.variable} font-sans`}>{children}</body>
     </html>
