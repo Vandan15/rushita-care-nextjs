@@ -259,13 +259,15 @@ export const deletePatient = async (patientId: string): Promise<void> => {
   }
 }
 
-export const markAttendance = async (patientId: string, status: "present" | "absent"): Promise<void> => {
+export const markAttendance = async (patientId: string, status: "present" | "absent", customDate?: Date): Promise<void> => {
+  const timestamp = customDate || new Date()
+  
   if (isDemoMode) {
     const newRecord: AttendanceRecord = {
       id: `att-${Date.now()}`,
       patientId,
       status,
-      timestamp: new Date().toISOString(),
+      timestamp: timestamp.toISOString(),
     }
     demoAttendance.unshift(newRecord)
     return
@@ -278,8 +280,21 @@ export const markAttendance = async (patientId: string, status: "present" | "abs
   await addDoc(collection(db, "attendance"), {
     patientId,
     status,
-    timestamp: serverTimestamp(),
+    timestamp: customDate ? timestamp : serverTimestamp(),
   })
+}
+
+export const deleteAttendance = async (attendanceId: string): Promise<void> => {
+  if (isDemoMode) {
+    demoAttendance = demoAttendance.filter(a => a.id !== attendanceId)
+    return
+  }
+
+  if (!db) {
+    throw new Error("Firestore not initialized")
+  }
+
+  await deleteDoc(doc(db, "attendance", attendanceId))
 }
 
 export const updateAttendance = async (attendanceId: string, status: "present" | "absent"): Promise<void> => {
