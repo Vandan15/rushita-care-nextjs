@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { Patient, AttendanceRecord } from "@/types/patient"
-import { getPatientAttendance, markAttendance, updateAttendance, deletePatient } from "@/lib/firebase-operations"
+import { getPatientAttendance, markAttendance, updateAttendance, deletePatient, deleteAttendance } from "@/lib/firebase-operations"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -47,6 +47,9 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null)
   const [modifyingRecord, setModifyingRecord] = useState<string | null>(null)
   const [copiedPatientId, setCopiedPatientId] = useState(false)
+  const [customDate, setCustomDate] = useState<Date | null>(null)
+  const [markingCustomAttendance, setMarkingCustomAttendance] = useState<"present" | "absent" | null>(null)
+  const [deletingRecord, setDeletingRecord] = useState<string | null>(null)
 
   useEffect(() => {
     loadAttendanceHistory()
@@ -98,6 +101,25 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
     }
   }
 
+  const handleMarkCustomDateAttendance = async (status: "present" | "absent") => {
+    if (!customDate) return
+    
+    setMarkingCustomAttendance(status)
+    try {
+      // Format the date to start of day to avoid timezone issues
+      const date = new Date(customDate)
+      date.setHours(0, 0, 0, 0)
+      
+      await markAttendance(patient.id, status, date)
+      await loadAttendanceHistory()
+      setCustomDate(null)
+    } catch (error) {
+      console.error("Error marking custom date attendance:", error)
+    } finally {
+      setMarkingCustomAttendance(null)
+    }
+  }
+
   const handleModifyTodayAttendance = async (newStatus: "present" | "absent") => {
     if (!todayAttendance) return
 
@@ -115,6 +137,20 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
   const clearDateFilter = () => {
     setStartDate(null)
     setEndDate(null)
+  }
+
+  const handleDeleteAttendance = async (attendanceId: string) => {
+    if (window.confirm("Are you sure you want to delete this attendance record? This action cannot be undone.")) {
+      setDeletingRecord(attendanceId)
+      try {
+        await deleteAttendance(attendanceId)
+        await loadAttendanceHistory()
+      } catch (error) {
+        console.error("Error deleting attendance record:", error)
+      } finally {
+        setDeletingRecord(null)
+      }
+    }
   }
 
   const handleDelete = async () => {
@@ -431,6 +467,48 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
               </div>
             </div>
           )}
+          
+          {/* Custom Date Attendance */}
+          <div className="mt-6 pt-4 border-t border-slate-200">
+            <h3 className="text-sm font-medium text-slate-700 mb-3">Mark Attendance for Another Date</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2">
+                <DatePicker
+                  selected={customDate}
+                  onChange={(date) => setCustomDate(date)}
+                  maxDate={new Date()}
+                  placeholderText="Select a past date"
+                  className="w-full"
+                  dateFormat="MMM dd, yyyy"
+                  showMonthDropdown
+                  showYearDropdown
+                  dropdownMode="select"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => customDate && handleMarkCustomDateAttendance("present")}
+                  disabled={!customDate || markingCustomAttendance !== null}
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
+                  size="sm"
+                >
+                  {markingCustomAttendance === "present" ? "Marking..." : "Mark Present"}
+                </Button>
+                <Button
+                  onClick={() => customDate && handleMarkCustomDateAttendance("absent")}
+                  disabled={!customDate || markingCustomAttendance !== null}
+                  variant="outline"
+                  className="flex-1 border-red-200 text-red-600 hover:bg-red-50 text-sm"
+                  size="sm"
+                >
+                  {markingCustomAttendance === "absent" ? "Marking..." : "Mark Absent"}
+                </Button>
+              </div>
+            </div>
+            {customDate && customDate > new Date() && (
+              <p className="mt-2 text-xs text-red-500">Cannot mark attendance for future dates</p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -481,8 +559,27 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
                           </div>
                         </div>
                       </div>
-                      <div className="text-xs sm:text-sm text-slate-500">
-                        {format(new Date(record.timestamp), "h:mm a")}
+                      <div className="flex items-center space-x-2">
+                        <div className="text-xs sm:text-sm text-slate-500">
+                          {format(new Date(record.timestamp), "h:mm a")}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-red-500 hover:bg-red-50 hover:text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteAttendance(record.id)
+                          }}
+                          disabled={deletingRecord === record.id}
+                        >
+                          {deletingRecord === record.id ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                          <span className="sr-only">Delete</span>
+                        </Button>
                       </div>
                     </div>
                     {index < filteredRecords.length - 1 && <Separator className="my-2" />}

@@ -34,6 +34,10 @@
   --radius: 0.75rem;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 .dark {
   --background: #0f172a;
   --foreground: #f8fafc;
