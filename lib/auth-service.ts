@@ -1,5 +1,6 @@
-import { auth, isDemoMode } from "./firebase"
+import { auth, isDemoMode, storage } from "./firebase"
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, type User } from "firebase/auth"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 // Demo user for demo mode
 const DEMO_USER: User = {
@@ -10,6 +11,7 @@ const DEMO_USER: User = {
   phoneNumber: null,
   emailVerified: true,
   isAnonymous: false,
+  providerId: "",
   metadata: {} as any,
   providerData: [],
   refreshToken: "",
@@ -96,13 +98,27 @@ class AuthService {
 
 export const authService = new AuthService()
 
-export const updateUserProfile = async (profileData: { displayName?: string; photoURL?: string }) => {
+interface UpdateProfileData {
+  displayName?: string;
+  photoURL?: string | null;
+  photoFile?: File;
+}
+
+export const updateUserProfile = async (profileData: UpdateProfileData) => {
   if (isDemoMode) {
     // In demo mode, just update the demo user object
     if (authService.getCurrentUser()) {
-      const currentUser = authService.getCurrentUser()!
-      if (profileData.displayName) currentUser.displayName = profileData.displayName
-      if (profileData.photoURL) currentUser.photoURL = profileData.photoURL
+      const currentUser = authService.getCurrentUser()!;
+      // Create a new object with updated properties
+      const updatedUser = {
+        ...currentUser,
+        displayName: profileData.displayName !== undefined ? profileData.displayName : currentUser.displayName,
+        photoURL: profileData.photoURL !== undefined ? profileData.photoURL : currentUser.photoURL,
+      };
+      // @ts-ignore - We know this is a private method, but we need to update the user
+      authService['currentUser'] = updatedUser;
+      // @ts-ignore - Notify listeners of the update
+      authService.notifyListeners();
     }
     return
   }
@@ -111,5 +127,58 @@ export const updateUserProfile = async (profileData: { displayName?: string; pho
     throw new Error("No authenticated user")
   }
 
-  await updateProfile(auth.currentUser, profileData)
+  if (!storage) {
+    throw new Error('Storage is not initialized');
+  }
+
+  try {
+    let photoURL = profileData.photoURL;
+    
+    // If there's a file to upload, upload it to Firebase Storage first
+    if (profileData.photoFile) {
+      const fileExtension = profileData.photoFile.name.split('.').pop();
+      const storageRef = ref(storage, `profile-pictures/${auth.currentUser.uid}.${fileExtension}`);
+      
+      // Upload the file
+      const snapshot = await uploadBytes(storageRef, profileData.photoFile);
+      
+      // Get the download URL
+      photoURL = await getDownloadURL(snapshot.ref);
+    }
+    
+    // Prepare update data
+    const updateData: { displayName?: string; photoURL?: string | null } = {};
+    
+    if (profileData.displayName !== undefined) {
+      updateData.displayName = profileData.displayName;
+    }
+    
+    if (photoURL !== undefined) {
+      updateData.photoURL = photoURL;
+    } else if (profileData.photoURL === null) {
+      // If explicitly setting photoURL to null
+      updateData.photoURL = null;
+    }
+    
+    // Only update if there's something to update
+    if (Object.keys(updateData).length > 0) {
+      await updateProfile(auth.currentUser, updateData);
+      
+      // Update the local user object by creating a new object with updated properties
+      const updatedUser = {
+        ...auth.currentUser,
+        displayName: profileData.displayName !== undefined ? profileData.displayName : auth.currentUser.displayName,
+        photoURL: photoURL !== undefined ? photoURL : auth.currentUser.photoURL,
+      };
+      
+      // Update the auth service's current user
+      // @ts-ignore - We know this is a private method, but we need to update the user
+      authService['currentUser'] = updatedUser;
+      // @ts-ignore - We know this is a private method, but we need to notify listeners
+      authService.notifyListeners();
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error;
+  }
 }

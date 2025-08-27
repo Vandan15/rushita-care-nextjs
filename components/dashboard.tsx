@@ -82,7 +82,7 @@ export default function Dashboard({ user }: DashboardProps) {
         return <AddPatientPage onBack={handleBackToPatients} />
       case "edit-patient":
         return selectedPatient ? (
-          <AddPatientPage patient={selectedPatient} onBack={() => setCurrentPage("patient-details")} />
+          <AddPatientPage patient={selectedPatient} onBack={handleBackToPatients} />
         ) : null
       default:
         return null

@@ -26,13 +26,13 @@ const auth = getAuth(app)
 async function createAdminUser() {
   try {
     // Change these values to your desired admin credentials
-    const adminEmail = "vandan@rushitacare.com" // Change this to your email
-    const adminPassword = "Test123!" // Change this to your desired password
+    const adminEmail = "rushita@gmail.com" // Change this to your email
+    const adminPassword = "rushita123" // Change this to your desired password
 
     const userRecord = await auth.createUser({
       email: adminEmail,
       password: adminPassword,
-      displayName: "Admin User",
+      displayName: "Rushita Patil",
       emailVerified: true,
     })
 

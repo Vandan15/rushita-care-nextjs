@@ -11,7 +11,6 @@ interface MobileNavigationProps {
 }
 
 export default function MobileNavigation({ currentPage, onPageChange, onAddPatient }: MobileNavigationProps) {
-  console.log(currentPage)
   const navItems = [
     { id: "patients" as PageType, icon: Users, label: "Patients" },
     { id: "analytics" as PageType, icon: BarChart3, label: "Analytics" },

@@ -7,6 +7,7 @@ export interface Patient {
   profileImage?: string
   createdAt: string
   updatedAt?: string
+  notes?: string
 }
 
 export interface AttendanceRecord {
