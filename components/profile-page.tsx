@@ -147,7 +147,7 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
 
             <div className="text-center md:text-left">
               <h2 className="text-lg sm:text-2xl font-bold text-slate-800">
-                Dr. {formData.displayName || formData.email?.split("@")[0]}
+                {formData.displayName || formData.email?.split("@")[0]}
               </h2>
               <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-2">
                 {formData.specialization}

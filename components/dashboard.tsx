@@ -9,6 +9,7 @@ import AddPatientPage from "@/components/add-patient-page"
 import PatientDetailsPage from "@/components/patient-details-page"
 import AttendanceAnalytics from "@/components/attendance-analytics"
 import ProfilePage from "@/components/profile-page"
+import AllInvoicesPage from "@/components/all-invoices-page"
 import MobileNavigation from "@/components/mobile-navigation"
 import type { Patient } from "@/types/patient"
 import { AnimatePresence, motion } from "framer-motion"
@@ -17,7 +18,7 @@ interface DashboardProps {
   user: User
 }
 
-export type PageType = "patients" | "analytics" | "profile" | "patient-details" | "add-patient" | "edit-patient"
+export type PageType = "patients" | "analytics" | "profile" | "patient-details" | "add-patient" | "edit-patient" | "invoices"
 
 export default function Dashboard({ user }: DashboardProps) {
   const [patients, setPatients] = useState<Patient[]>([])
@@ -72,11 +73,13 @@ export default function Dashboard({ user }: DashboardProps) {
         )
       case "analytics":
         return <AttendanceAnalytics patients={patients} onBack={handleBackToPatients} />
+      case "invoices":
+        return <AllInvoicesPage />
       case "profile":
         return <ProfilePage user={user}  onBack={handleBackToPatients}/>
       case "patient-details":
         return selectedPatient ? (
-          <PatientDetailsPage patient={selectedPatient} onBack={handleBackToPatients} onEdit={handleEditPatient} />
+          <PatientDetailsPage patient={selectedPatient} onBack={handleBackToPatients} onEdit={handleEditPatient} user={user} />
         ) : null
       case "add-patient":
         return <AddPatientPage onBack={handleBackToPatients} />

@@ -9,7 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import DatePicker from "react-datepicker";
-import { BarChart3, TrendingUp, Users, Filter, RotateCcw, ArrowLeft } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Filter, RotateCcw, ArrowLeft, FileText } from "lucide-react";
+import AllInvoicesPage from "@/components/all-invoices-page";
 import { format, startOfDay, endOfDay } from "date-fns";
 
 interface AttendanceAnalyticsProps {
@@ -267,8 +268,8 @@ export default function AttendanceAnalytics({
               No attendance data available
             </div>
           ) : (
-            <>
-              <div className="space-y-4">
+            <ScrollArea className="h-[500px]">
+              <div className="space-y-4 pr-4">
                 {analytics.map((data) => (
                   <div
                     key={data.patient.id}
@@ -378,10 +379,13 @@ export default function AttendanceAnalytics({
                   </div>
                 ))}
               </div>
-            </>
+            </ScrollArea>
           )}
         </CardContent>
       </Card>
+
+      {/* All Invoices Section */}
+      <AllInvoicesPage />
     </div>
   );
 }

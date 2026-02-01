@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import type { User } from "firebase/auth"
 import type { Patient, AttendanceRecord } from "@/types/patient"
+import type { Invoice } from "@/types/invoice"
 import { getPatientAttendance, markAttendance, updateAttendance, deletePatient, deleteAttendance } from "@/lib/firebase-operations"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -28,16 +30,20 @@ import {
   NotepadTextDashedIcon,
   PencilIcon,
   Copy,
+  FileText,
 } from "lucide-react"
+import InvoiceGenerationDialog from "@/components/invoice-generation-dialog"
+import InvoiceList from "@/components/invoice-list"
 import { format, isToday, parseISO, startOfDay, endOfDay } from "date-fns"
 
 interface PatientDetailsPageProps {
   patient: Patient
   onBack: () => void
   onEdit: (patient: Patient) => void
+  user: User
 }
 
-export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientDetailsPageProps) {
+export default function PatientDetailsPage({ patient, onBack, onEdit, user }: PatientDetailsPageProps) {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([])
   const [filteredRecords, setFilteredRecords] = useState<AttendanceRecord[]>([])
   const [loading, setLoading] = useState(false)
@@ -50,6 +56,8 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
   const [customDate, setCustomDate] = useState<Date | null>(null)
   const [markingCustomAttendance, setMarkingCustomAttendance] = useState<"present" | "absent" | null>(null)
   const [deletingRecord, setDeletingRecord] = useState<string | null>(null)
+  const [showInvoiceDialog, setShowInvoiceDialog] = useState(false)
+  const [lastCreatedInvoice, setLastCreatedInvoice] = useState<Invoice | null>(null)
 
   useEffect(() => {
     loadAttendanceHistory()
@@ -196,6 +204,15 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
           <h1 className="text-xl font-bold text-gray-900">Patient Details</h1>
         </div> */}
         <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowInvoiceDialog(true)}
+            className="bg-white border-slate-200"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Invoice</span>
+          </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(patient)} className="bg-white border-slate-200">
             <Edit className="h-4 w-4" />
             <span>Edit</span>
@@ -588,6 +605,30 @@ export default function PatientDetailsPage({ patient, onBack, onEdit }: PatientD
               </div>
             </ScrollArea>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Invoice Generation Dialog */}
+      <InvoiceGenerationDialog
+        open={showInvoiceDialog}
+        onOpenChange={setShowInvoiceDialog}
+        patient={patient}
+        user={user}
+        onInvoiceCreated={(invoice) => {
+          setLastCreatedInvoice(invoice)
+        }}
+      />
+
+      {/* Invoices Section */}
+      <Card className="bg-white border-slate-200 shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center text-base sm:text-lg">
+            <FileText className="h-5 w-5 mr-2 text-blue-600" />
+            Generated Invoices
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InvoiceList patientId={patient.id} newInvoice={lastCreatedInvoice} />
         </CardContent>
       </Card>
     </div>
