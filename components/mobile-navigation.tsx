@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Users, BarChart3, User, Plus } from "lucide-react"
+import { Users, BarChart3, User, Plus, FileText } from "lucide-react"
 import type { PageType } from "./dashboard"
 
 interface MobileNavigationProps {

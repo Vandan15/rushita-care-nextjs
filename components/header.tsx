@@ -18,6 +18,8 @@ export default function Header({ user, currentPage, onPageChange }: HeaderProps)
         return "Patients"
       case "analytics":
         return "Analytics"
+      case "invoices":
+        return "All Invoices"
       case "profile":
         return "Profile"
       case "patient-details":
@@ -59,7 +61,7 @@ export default function Header({ user, currentPage, onPageChange }: HeaderProps)
                 </AvatarFallback>
               </Avatar>
               <div className="text-sm">
-                <div className="font-medium text-slate-700">Dr. {user.displayName || user.email?.split("@")[0]}</div>
+                <div className="font-medium text-slate-700">{user.displayName || user.email?.split("@")[0]}</div>
                 <div className="text-slate-500">Physiotherapist</div>
               </div>
             </button>
