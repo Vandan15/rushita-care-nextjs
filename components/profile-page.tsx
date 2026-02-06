@@ -1,9 +1,10 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { User } from "firebase/auth";
 import { updateUserProfile } from "@/lib/auth-service";
+import { getUserProfile, updateUserProfileData } from "@/lib/user-profile-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,8 @@ import {
   LogOut,
   Save,
   ArrowLeft,
+  FileText,
+  MapPin,
 } from "lucide-react";
 
 interface ProfilePageProps {
@@ -37,10 +40,34 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
     specialization: "Physiotherapist",
     bio: "Dedicated physiotherapist committed to helping patients recover and improve their quality of life.",
     photoURL: user.photoURL || "",
+    registrationNumber: "",
+    address: "",
   });
   const [loading, setLoading] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const [message, setMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load user profile data on mount
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const profile = await getUserProfile(user.uid);
+        if (profile) {
+          setFormData((prev) => ({
+            ...prev,
+            registrationNumber: profile.registrationNumber || "",
+            address: profile.address || "",
+          }));
+        }
+      } catch (error) {
+        console.error("Error loading user profile:", error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    loadUserProfile();
+  }, [user.uid]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,13 +75,21 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
     setMessage("");
 
     try {
+      // Update Firebase Auth profile (displayName, photoURL)
       await updateUserProfile({
         displayName: formData.displayName,
         photoFile: selectedFile || undefined,
         photoURL: selectedFile ? undefined : formData.photoURL,
       });
+
+      // Update Firestore user profile (registrationNumber, address)
+      await updateUserProfileData(user.uid, {
+        registrationNumber: formData.registrationNumber,
+        address: formData.address,
+      });
+
       setMessage("Profile updated successfully!");
-      
+
       // Clear the file input after successful upload
       setSelectedFile(null);
       if (fileInputRef.current) {
@@ -208,6 +243,52 @@ export default function ProfilePage({ user, onBack }: ProfilePageProps) {
                   Email cannot be changed
                 </p>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="registrationNumber"
+                className="text-slate-700 font-medium"
+              >
+                Registration Number
+              </Label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  id="registrationNumber"
+                  value={formData.registrationNumber}
+                  onChange={(e) =>
+                    handleChange("registrationNumber", e.target.value)
+                  }
+                  placeholder="Enter your registration number"
+                  className="pl-10 border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm"
+                  disabled={loadingProfile}
+                />
+              </div>
+              <p className="text-xs text-slate-500">
+                Your professional registration number (shown on invoices)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address" className="text-slate-700 font-medium">
+                Address
+              </Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Textarea
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                  placeholder="Enter your clinic/office address"
+                  rows={3}
+                  className="pl-10 border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-white text-sm"
+                  disabled={loadingProfile}
+                />
+              </div>
+              <p className="text-xs text-slate-500">
+                Your clinic or office address (shown on invoices)
+              </p>
             </div>
 
             {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

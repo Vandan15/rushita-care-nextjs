@@ -49,10 +49,16 @@ const styles = StyleSheet.create({
     color: "#1e293b",
     fontWeight: "bold",
   },
-  therapistEmail: {
+  therapistRegistration: {
     fontSize: 9,
     color: "#64748b",
     marginTop: 2,
+  },
+  therapistAddress: {
+    fontSize: 9,
+    color: "#64748b",
+    marginTop: 2,
+    maxWidth: 200,
   },
 
   // Invoice metadata
@@ -321,6 +327,16 @@ const InvoicePDFTemplate: React.FC<InvoicePDFTemplateProps> = ({ invoice }) => {
           <View style={styles.headerInfo}>
             <View style={styles.headerLeft}>
               <Text style={styles.therapistName}>{invoice.therapistName}</Text>
+              {invoice.therapistRegistrationNumber && (
+                <Text style={styles.therapistRegistration}>
+                  Reg. No: {invoice.therapistRegistrationNumber}
+                </Text>
+              )}
+              {invoice.therapistAddress && (
+                <Text style={styles.therapistAddress}>
+                  {invoice.therapistAddress}
+                </Text>
+              )}
             </View>
             <View style={styles.headerRight}>
               <Text style={styles.metadataLabel}>Invoice No.</Text>
