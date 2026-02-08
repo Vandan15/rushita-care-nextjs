@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import DatePicker from "react-datepicker"
 import {
   ArrowLeft,
   Phone,
@@ -408,29 +407,21 @@ export default function PatientDetailsPage({ patient, onBack, onEdit, user }: Pa
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">From Date</label>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                placeholderText="Select start date"
-                className="w-full"
-                dateFormat="MMM dd, yyyy"
+              <input
+                type="date"
+                value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+                onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                className="w-full native-date-input"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">To Date</label>
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate!}
-                placeholderText="Select end date"
-                className="w-full"
-                dateFormat="MMM dd, yyyy"
+              <input
+                type="date"
+                value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+                onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                min={startDate ? format(startDate, 'yyyy-MM-dd') : undefined}
+                className="w-full native-date-input"
               />
             </div>
           </div>
@@ -490,16 +481,12 @@ export default function PatientDetailsPage({ patient, onBack, onEdit, user }: Pa
             <h3 className="text-sm font-medium text-slate-700 mb-3">Mark Attendance for Another Date</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-2">
-                <DatePicker
-                  selected={customDate}
-                  onChange={(date) => setCustomDate(date)}
-                  maxDate={new Date()}
-                  placeholderText="Select a past date"
-                  className="w-full"
-                  dateFormat="MMM dd, yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
+                <input
+                  type="date"
+                  value={customDate ? format(customDate, 'yyyy-MM-dd') : ''}
+                  onChange={(e) => setCustomDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                  max={format(new Date(), 'yyyy-MM-dd')}
+                  className="w-full native-date-input"
                 />
               </div>
               <div className="flex gap-2">

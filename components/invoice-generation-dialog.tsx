@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, ArrowRight, ArrowLeft, CheckCircle, FileText, TrendingUp } from "lucide-react"
-import DatePicker from "react-datepicker"
 import { format, parseISO, startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns"
 
 interface InvoiceGenerationDialogProps {
@@ -311,37 +310,23 @@ export default function InvoiceGenerationDialog({
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       Start Date
                     </label>
-                    <DatePicker
-                      selected={startDate}
-                      onChange={(date) => setStartDate(date)}
-                      selectsStart
-                      startDate={startDate}
-                      endDate={endDate}
-                      maxDate={new Date()}
-                      placeholderText="Select start date"
-                      className="w-full"
-                      dateFormat="MMM dd, yyyy"
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
+                    <input
+                      type="date"
+                      value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+                      onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                      max={format(new Date(), 'yyyy-MM-dd')}
+                      className="w-full native-date-input"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">End Date</label>
-                    <DatePicker
-                      selected={endDate}
-                      onChange={(date) => setEndDate(date)}
-                      selectsEnd
-                      startDate={startDate}
-                      endDate={endDate}
-                      minDate={startDate || undefined}
-                      maxDate={new Date()}
-                      placeholderText="Select end date"
-                      className="w-full"
-                      dateFormat="MMM dd, yyyy"
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
+                    <input
+                      type="date"
+                      value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+                      onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                      min={startDate ? format(startDate, 'yyyy-MM-dd') : undefined}
+                      max={format(new Date(), 'yyyy-MM-dd')}
+                      className="w-full native-date-input"
                     />
                   </div>
                 </div>

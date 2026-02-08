@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import DatePicker from "react-datepicker";
 import { BarChart3, TrendingUp, Users, Filter, RotateCcw, ArrowLeft, FileText } from "lucide-react";
 import AllInvoicesPage from "@/components/all-invoices-page";
 import { format, startOfDay, endOfDay } from "date-fns";
@@ -161,31 +160,23 @@ export default function AttendanceAnalytics({
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 From Date
               </label>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                placeholderText="Select start date"
-                className="w-full"
-                dateFormat="MMM dd, yyyy"
+              <input
+                type="date"
+                value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+                onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                className="w-full native-date-input"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 To Date
               </label>
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate!}
-                placeholderText="Select end date"
-                className="w-full"
-                dateFormat="MMM dd, yyyy"
+              <input
+                type="date"
+                value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+                onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value + 'T00:00:00') : null)}
+                min={startDate ? format(startDate, 'yyyy-MM-dd') : undefined}
+                className="w-full native-date-input"
               />
             </div>
           </div>
