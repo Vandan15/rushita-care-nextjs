@@ -1,5 +1,3 @@
-@import "react-datepicker/dist/react-datepicker.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -159,99 +157,8 @@ html {
   animation-delay: 1s;
 }
 
-/* Modern DatePicker Styles */
-.react-datepicker-wrapper {
-  width: 100%;
-}
-
-.react-datepicker {
-  font-family: var(--font-poppins), system-ui, sans-serif;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  background: white;
-}
-
-.react-datepicker__header {
-  background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
-  border-bottom: none;
-  border-radius: 12px 12px 0 0;
-  padding: 16px;
-}
-
-.react-datepicker__current-month {
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.react-datepicker__navigation {
-  top: 20px;
-}
-
-.react-datepicker__navigation--previous {
-  left: 20px;
-  border-right-color: white;
-}
-
-.react-datepicker__navigation--next {
-  right: 20px;
-  border-left-color: white;
-}
-
-.react-datepicker__day-names {
-  background: #f8fafc;
-  margin: 0;
-  padding: 8px 0;
-}
-
-.react-datepicker__day-name {
-  color: #64748b;
-  font-weight: 600;
-  font-size: 12px;
-}
-
-.react-datepicker__day {
-  color: #475569;
-  border-radius: 8px;
-  margin: 2px;
-  width: 32px;
-  height: 32px;
-  line-height: 32px;
-  transition: all 0.2s;
-}
-
-.react-datepicker__day:hover {
-  background: #e0f2fe;
-  color: #0c4a6e;
-}
-
-.react-datepicker__day--selected {
-  background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
-  color: white;
-  font-weight: 600;
-}
-
-.react-datepicker__day--in-range {
-  background: #e0f2fe;
-  color: #0c4a6e;
-}
-
-.react-datepicker__day--range-start,
-.react-datepicker__day--range-end {
-  background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
-  color: white;
-  font-weight: 600;
-}
-
-.react-datepicker__day--today {
-  background: #fef3c7;
-  color: #92400e;
-  font-weight: 600;
-}
-
-.react-datepicker__input-container input {
-  width: 100%;
+/* Native Date Input Styles */
+.native-date-input {
   padding: 12px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -259,9 +166,10 @@ html {
   transition: all 0.2s;
   background: white;
   font-family: var(--font-poppins), system-ui, sans-serif;
+  color: #475569;
 }
 
-.react-datepicker__input-container input:focus {
+.native-date-input:focus {
   outline: none;
   border-color: #0ea5e9;
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
