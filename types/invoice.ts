@@ -16,6 +16,8 @@ export interface Invoice {
   // Physiotherapist details (from auth user at time of creation)
   therapistName: string        // From user.displayName
   therapistEmail: string       // From user.email
+  therapistRegistrationNumber?: string  // Registration number from user profile
+  therapistAddress?: string    // Address from user profile
 
   // Invoice details
   dateRange: {

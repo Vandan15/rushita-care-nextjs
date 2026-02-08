@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import type { User } from "firebase/auth"
 import type { Patient, AttendanceRecord } from "@/types/patient"
 import type { Invoice, InvoiceSession } from "@/types/invoice"
+import type { UserProfile } from "@/types/user-profile"
 import { getPatientAttendance } from "@/lib/firebase-operations"
 import { createInvoice } from "@/lib/invoice-operations"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
+import { getUserProfile } from "@/lib/user-profile-service"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,15 +46,19 @@ export default function InvoiceGenerationDialog({
   const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([])
   const [filteredSessions, setFilteredSessions] = useState<AttendanceRecord[]>([])
 
+  // User profile data
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+
   // Loading and error states
   const [loadingAttendance, setLoadingAttendance] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Load attendance records when dialog opens
+  // Load attendance records and user profile when dialog opens
   useEffect(() => {
     if (open) {
       loadAttendanceRecords()
+      loadUserProfile()
       // Pre-populate patient name
       setPatientFullName(patient.name || "")
       // Set default dates for "this month"
@@ -64,6 +70,15 @@ export default function InvoiceGenerationDialog({
       resetForm()
     }
   }, [open, patient.id])
+
+  const loadUserProfile = async () => {
+    try {
+      const profile = await getUserProfile(user.uid)
+      setUserProfile(profile)
+    } catch (err) {
+      console.error("Error loading user profile:", err)
+    }
+  }
 
   // Filter sessions when date range changes
   useEffect(() => {
@@ -176,6 +191,8 @@ export default function InvoiceGenerationDialog({
         patientAddress: patient.address,
         therapistName,
         therapistEmail,
+        therapistRegistrationNumber: userProfile?.registrationNumber || "",
+        therapistAddress: userProfile?.address || "",
         dateRange: {
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
