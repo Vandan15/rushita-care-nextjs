@@ -82,7 +82,8 @@ export default function MarkPaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      {/* bg-white is required — `bg-background` resolves to invalid CSS in this app */}
+      <DialogContent className="bg-white w-[calc(100%-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center text-base sm:text-lg">
             <IndianRupee className="h-5 w-5 mr-2 text-green-600" />

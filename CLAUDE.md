@@ -161,6 +161,13 @@ dynamic import is what keeps it out of SSR. Preserve that pattern.
   palette classes.** (Only `components/ui/` primitives reference the tokens, harmlessly.) If you
   ever need the tokens to work, the fix is converting the vars to HSL triplets — a deliberate,
   whole-app change, not a drive-by.
+- **Consequence: every `<DialogContent>` MUST pass `bg-white` itself.** The primitive ships
+  `bg-background`, which resolves to invalid CSS here, so a dialog without it renders with a fully
+  transparent panel — page content shows straight through and it looks broken. All six dialogs in
+  `components/` set it explicitly. The same applies to `Input`/`Textarea` (`bg-background`,
+  `border-input`): pass `bg-white border-slate-200`. Verify a new dialog with
+  `getComputedStyle(document.querySelector('[role="dialog"]')).backgroundColor` — it must be
+  `rgb(255, 255, 255)`, not `rgba(0, 0, 0, 0)`.
 - The house look: white/glass cards on a `slate-50 → blue-50 → cyan-50` gradient, blue→cyan
   gradients for accents, `rounded-xl`, Poppins via `--font-poppins`. Helpers `.medical-gradient`,
   `.card-hover`, `.glass-effect` are in `app/globals.css`.

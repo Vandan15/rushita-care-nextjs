@@ -10,11 +10,14 @@ const CURRENT_BUILD_ID = process.env.NEXT_PUBLIC_BUILD_ID ?? "unknown"
 
 const POLL_INTERVAL_MS = 2 * 60 * 1000 // re-check every 2 minutes
 const SNOOZE_MS = 15 * 60 * 1000 // "Later" hides the prompt for 15 minutes
+const CACHE_BUST_PARAM = "_updated"
+const REFRESH_GUARD_KEY = "rushitacare:refreshed-for-build"
 
 export default function UpdateNotifier() {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const snoozedUntil = useRef<number>(0)
+  const latestBuildId = useRef<string | null>(null)
 
   const checkForUpdate = useCallback(async () => {
     // Nothing to compare against if the build id was never injected (e.g. dev server)
@@ -27,16 +30,38 @@ export default function UpdateNotifier() {
 
       const data: { buildId?: string } = await res.json()
       if (!data.buildId || data.buildId === "unknown") return
+      if (data.buildId === CURRENT_BUILD_ID) return
+      if (Date.now() < snoozedUntil.current) return
 
-      if (data.buildId !== CURRENT_BUILD_ID && Date.now() >= snoozedUntil.current) {
-        setUpdateAvailable(true)
+      // If we already forced a refresh for this exact build and the bundle STILL
+      // reports the old id, something upstream is serving stale HTML. Prompting
+      // again would just spin the user through an endless refresh loop.
+      try {
+        if (sessionStorage.getItem(REFRESH_GUARD_KEY) === data.buildId) return
+      } catch {
+        // sessionStorage can throw in private mode — fall through and prompt
       }
+
+      latestBuildId.current = data.buildId
+      setUpdateAvailable(true)
     } catch {
       // Offline or the deployment is mid-swap — try again on the next tick
     }
   }, [])
 
   useEffect(() => {
+    // A forced refresh lands here with a cache-busting param; tidy it out of the
+    // address bar so the URL stays clean (and the PWA start_url still matches).
+    try {
+      const url = new URL(window.location.href)
+      if (url.searchParams.has(CACHE_BUST_PARAM)) {
+        url.searchParams.delete(CACHE_BUST_PARAM)
+        window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`)
+      }
+    } catch {
+      // Non-fatal
+    }
+
     checkForUpdate()
 
     const interval = setInterval(checkForUpdate, POLL_INTERVAL_MS)
@@ -60,9 +85,16 @@ export default function UpdateNotifier() {
 
   const handleRefresh = async () => {
     setRefreshing(true)
+
+    // Remember which build we're refreshing for, so a failed refresh can't loop.
     try {
-      // Best-effort hard refresh: drop anything a cache layer is holding on to
-      // before reloading, so the browser fetches the new HTML + assets.
+      if (latestBuildId.current) sessionStorage.setItem(REFRESH_GUARD_KEY, latestBuildId.current)
+    } catch {
+      // Ignore — the guard is a nicety, not a requirement
+    }
+
+    try {
+      // Drop anything a cache layer is holding on to before navigating.
       if (typeof caches !== "undefined") {
         const keys = await caches.keys()
         await Promise.all(keys.map((key) => caches.delete(key)))
@@ -74,7 +106,16 @@ export default function UpdateNotifier() {
       }
     } catch (error) {
       console.error("Error clearing caches before refresh:", error)
-    } finally {
+    }
+
+    // A unique URL guarantees a fresh document even when location.reload() would
+    // be served from the HTTP cache (notably inside an installed PWA on iOS).
+    // replace() keeps it out of the back-history.
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set(CACHE_BUST_PARAM, Date.now().toString(36))
+      window.location.replace(url.toString())
+    } catch {
       window.location.reload()
     }
   }
@@ -87,26 +128,30 @@ export default function UpdateNotifier() {
   return (
     <Dialog open={updateAvailable} onOpenChange={(open) => !open && handleSnooze()}>
       <DialogContent
-        className="sm:max-w-md"
-        // Force a deliberate choice — dismissing by accident leaves the user on a stale app
+        // bg-white is required: this app's --background token is a hex value behind
+        // an hsl() wrapper, so `bg-background` compiles to invalid CSS and the panel
+        // would render fully transparent. Every dialog here sets it explicitly.
+        className="bg-white border-slate-200 rounded-2xl w-[calc(100%-2rem)] max-w-sm p-6 [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg">
-            <Sparkles className="h-7 w-7 text-white" />
+        <DialogHeader className="text-center sm:text-center">
+          <div className="mx-auto mb-1 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-200/60">
+            <Sparkles className="h-8 w-8 text-white" />
           </div>
-          <DialogTitle className="text-center text-lg">New updates available</DialogTitle>
-          <DialogDescription className="text-center">
-            A newer version of RushitaCare has been released. Please refresh to get the latest features and fixes.
+          <DialogTitle className="text-center text-lg font-bold text-slate-800">
+            New updates available
+          </DialogTitle>
+          <DialogDescription className="text-center text-sm text-slate-500 leading-relaxed">
+            A newer version of RushitaCare is ready. Refresh to get the latest features and fixes.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2 pt-2">
+        <div className="flex flex-col gap-2">
           <Button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+            className="w-full h-11 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold shadow-md disabled:opacity-100"
           >
             {refreshing ? (
               <>
@@ -120,7 +165,12 @@ export default function UpdateNotifier() {
               </>
             )}
           </Button>
-          <Button variant="ghost" onClick={handleSnooze} disabled={refreshing} className="w-full text-slate-500">
+          <Button
+            variant="ghost"
+            onClick={handleSnooze}
+            disabled={refreshing}
+            className="w-full h-10 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+          >
             Later
           </Button>
         </div>
