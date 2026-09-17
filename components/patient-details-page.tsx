@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import type { User } from "firebase/auth"
 import type { Patient, AttendanceRecord } from "@/types/patient"
 import type { Invoice } from "@/types/invoice"
+import type { Payment } from "@/types/payment"
 import { getPatientAttendance, markAttendance, updateAttendance, deletePatient, deleteAttendance } from "@/lib/firebase-operations"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -30,9 +31,12 @@ import {
   PencilIcon,
   Copy,
   FileText,
+  Wallet,
 } from "lucide-react"
 import InvoiceGenerationDialog from "@/components/invoice-generation-dialog"
 import InvoiceList from "@/components/invoice-list"
+import MarkPaymentDialog from "@/components/mark-payment-dialog"
+import PaymentHistory from "@/components/payment-history"
 import { format, isToday, parseISO, startOfDay, endOfDay } from "date-fns"
 
 interface PatientDetailsPageProps {
@@ -57,6 +61,8 @@ export default function PatientDetailsPage({ patient, onBack, onEdit, user }: Pa
   const [deletingRecord, setDeletingRecord] = useState<string | null>(null)
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false)
   const [lastCreatedInvoice, setLastCreatedInvoice] = useState<Invoice | null>(null)
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false)
+  const [lastRecordedPayment, setLastRecordedPayment] = useState<Payment | null>(null)
 
   useEffect(() => {
     loadAttendanceHistory()
@@ -202,7 +208,16 @@ export default function PatientDetailsPage({ patient, onBack, onEdit, user }: Pa
         {/* <div className="sm:hidden">
           <h1 className="text-xl font-bold text-gray-900">Patient Details</h1>
         </div> */}
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPaymentDialog(true)}
+            className="bg-white border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
+          >
+            <Wallet className="h-4 w-4" />
+            <span>Mark Paid</span>
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -605,6 +620,40 @@ export default function PatientDetailsPage({ patient, onBack, onEdit, user }: Pa
           setLastCreatedInvoice(invoice)
         }}
       />
+
+      {/* Mark Payment Dialog */}
+      <MarkPaymentDialog
+        open={showPaymentDialog}
+        onOpenChange={setShowPaymentDialog}
+        patient={patient}
+        user={user}
+        onPaymentRecorded={(payment) => {
+          setLastRecordedPayment(payment)
+        }}
+      />
+
+      {/* Payments Section */}
+      <Card className="bg-white border-slate-200 shadow-lg">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="flex items-center text-base sm:text-lg">
+              <Wallet className="h-5 w-5 mr-2 text-green-600" />
+              Payment History
+            </CardTitle>
+            <Button
+              size="sm"
+              onClick={() => setShowPaymentDialog(true)}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white flex-shrink-0"
+            >
+              <Wallet className="h-4 w-4 mr-1.5" />
+              Mark as Paid
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <PaymentHistory patientId={patient.id} newPayment={lastRecordedPayment} />
+        </CardContent>
+      </Card>
 
       {/* Invoices Section */}
       <Card className="bg-white border-slate-200 shadow-lg">

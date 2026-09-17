@@ -1,7 +1,8 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
+import UpdateNotifier from "@/components/update-notifier"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -22,7 +23,6 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/site.webmanifest",
-  themeColor: "#0ea5e9",
   openGraph:{
     images:[{
       url:"/og-image.png",
@@ -33,6 +33,18 @@ export const metadata: Metadata = {
   }
 }
 
+// maximumScale/userScalable stop iOS Safari from auto-zooming when an input is
+// focused. The real fix is the >=16px font-size on form controls in globals.css;
+// this is the belt-and-braces half.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#0ea5e9",
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -41,11 +53,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.png" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#0ea5e9" />
         <meta name="msapplication-TileColor" content="#0ea5e9" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
       </head>
-      <body className={`${poppins.variable} font-sans`}>{children}</body>
+      <body className={`${poppins.variable} font-sans`}>
+        {children}
+        <UpdateNotifier />
+      </body>
     </html>
   )
 }
