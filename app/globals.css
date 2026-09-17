@@ -174,3 +174,23 @@ html {
   border-color: #0ea5e9;
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
 }
+
+/*
+ * Stop mobile browsers auto-zooming the viewport when a field is focused.
+ *
+ * iOS Safari zooms in whenever a focused form control renders below 16px, and it
+ * ignores user-scalable=no for that behaviour — so the font-size is the actual fix,
+ * not the viewport meta. Tailwind utilities like `text-sm` (14px) and the 14px on
+ * .native-date-input sit in a later cascade layer than `base`, hence !important.
+ *
+ * Scoped to coarse pointers so the desktop type scale is untouched.
+ */
+@media (pointer: coarse), (max-width: 1024px) {
+  input,
+  select,
+  textarea,
+  .native-date-input,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+  }
+}
